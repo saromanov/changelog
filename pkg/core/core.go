@@ -7,22 +7,37 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-// Log returns git log
-func Log(path string) error {
+// MakeReleaseNotes provides creating of release notes based on git commits
+func MakeReleaseNotes(path string) error {
+	messages, err := log(path, func(m string) bool {
+		return len(m) > 0
+	})
+	if err != nil {
+		return fmt.Errorf("unable to get log messages")
+	}
+	fmt.Println(messages)
+	return nil
+}
+
+// log returns git log
+func log(path string, filter func(string) bool) ([]string, error) {
 	r, err := git.PlainOpen(path)
 	if err != nil {
-		return fmt.Errorf("unable to open repo: %v", err)
+		return nil, fmt.Errorf("unable to open repo: %v", err)
 	}
 	cIter, err := r.Log(&git.LogOptions{})
 	if err != nil {
-		return fmt.Errorf("unable to execute git log: %v", err)
+		return nil, fmt.Errorf("unable to execute git log: %v", err)
 	}
 
+	commits := []string{}
 	err = cIter.ForEach(func(c *object.Commit) error {
-		fmt.Println(c)
+		if filter(c.Message) {
+			commits = append(commits, c.Message)
+		}
 
 		return nil
 	})
 
-	return nil
+	return commits, nil
 }

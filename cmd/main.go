@@ -18,7 +18,7 @@ func build(c *cli.Context) error {
 		path = defaultPath
 	}
 
-	if err := core.Log(path); err != nil {
+	if err := core.MakeReleaseNotes(path); err != nil {
 		log.WithError(err).Errorf("unable to apply git log")
 		return err
 	}
