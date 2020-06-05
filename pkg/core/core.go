@@ -7,8 +7,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
-// log returns git log
-func log(path string) error {
+// Log returns git log
+func Log(path string) error {
 	r, err := git.PlainOpen(path)
 	if err != nil {
 		return fmt.Errorf("unable to open repo: %v", err)
