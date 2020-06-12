@@ -28,7 +28,7 @@ func build(c *cli.Context) error {
 }
 func main() {
 	app := &cli.App{
-		Name:  "starter",
+		Name:  "changelog",
 		Usage: "create puppet for the project",
 		Flags: []cli.Flag{
 			&cli.StringFlag{

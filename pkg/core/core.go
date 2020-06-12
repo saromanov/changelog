@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -9,12 +10,14 @@ import (
 
 // ReleaseRequest defines request for making release notes
 type ReleaseRequest struct {
-	Path string
+	Path  string
+	Since time.Time
+	Until time.Time
 }
 
 // MakeReleaseNotes provides creating of release notes based on git commits
 func MakeReleaseNotes(r ReleaseRequest) error {
-	messages, err := log(r.Path, func(m string) bool {
+	messages, err := log(r, func(m string) bool {
 		return len(m) > 0
 	})
 	if err != nil {
@@ -25,12 +28,19 @@ func MakeReleaseNotes(r ReleaseRequest) error {
 }
 
 // log returns git log
-func log(path string, filter func(string) bool) ([]string, error) {
-	r, err := git.PlainOpen(path)
+func log(req ReleaseRequest, filter func(string) bool) ([]string, error) {
+	r, err := git.PlainOpen(req.Path)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open repo: %v", err)
 	}
-	cIter, err := r.Log(&git.LogOptions{})
+	opt := &git.LogOptions{}
+	if !req.Since.IsZero() {
+		opt.Since = &req.Since
+	}
+	if !req.Until.IsZero() {
+		opt.Until = &req.Until
+	}
+	cIter, err := r.Log(opt)
 	if err != nil {
 		return nil, fmt.Errorf("unable to execute git log: %v", err)
 	}
