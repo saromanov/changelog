@@ -7,9 +7,14 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
+// ReleaseRequest defines request for making release notes
+type ReleaseRequest struct {
+	Path string
+}
+
 // MakeReleaseNotes provides creating of release notes based on git commits
-func MakeReleaseNotes(path string) error {
-	messages, err := log(path, func(m string) bool {
+func MakeReleaseNotes(r ReleaseRequest) error {
+	messages, err := log(r.Path, func(m string) bool {
 		return len(m) > 0
 	})
 	if err != nil {
