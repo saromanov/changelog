@@ -51,17 +51,14 @@ func log(req ReleaseRequest, filter func(string) bool) ([]models.Message, error)
 		return nil, fmt.Errorf("unable to get tags: %v", err)
 	}
 	tags.ForEach(func(c *object.Tag) error {
-		//comm,_ := c.Commit()
 		fmt.Println(c.Tagger.When.Clock())
 		return nil
 	})
 	commits := []models.Message{}
 	err = cIter.ForEach(func(c *object.Commit) error {
 		if filter(c.Message) {
-			c.Author.When.String()
 			commits = append(commits, models.Message{Message: c.Message, Author: c.Author.Name, Date: c.Author.When})
 		}
-
 		return nil
 	})
 
