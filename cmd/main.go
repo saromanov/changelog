@@ -46,6 +46,11 @@ func main() {
 				Value: "",
 				Usage: "return commits until the date",
 			},
+			&cli.StringFlag{
+				Name:  "version",
+				Value: "",
+				Usage: "generated new version",
+			},
 		},
 		Commands: []*cli.Command{
 			{

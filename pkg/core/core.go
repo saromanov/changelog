@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -46,19 +45,20 @@ func log(req ReleaseRequest, filter func(string) bool) ([]Report, error) {
 		return nil, fmt.Errorf("unable to execute git log: %v", err)
 	}
 
-	tags, err := r.Tags()
+	tags, err := r.TagObjects()
 	if err != nil {
 		return nil, fmt.Errorf("unable to get tags: %v", err)
 	}
-
-	tags.ForEach(func(c *plumbing.Reference) error {
-		fmt.Println(c.Name())
+	tags.ForEach(func(c *object.Tag) error {
+		//comm,_ := c.Commit()
+		fmt.Println(c.Tagger.When.Clock())
 		return nil
 	})
 	commits := []Report{}
 	err = cIter.ForEach(func(c *object.Commit) error {
 		if filter(c.Message) {
-			commits = append(commits, Report{Message: c.Message, Author: c.Author.Name})
+			c.Author.When.String()
+			commits = append(commits, Report{Message: c.Message, Author: c.Author.Name, Date: c.Author.When})
 		}
 
 		return nil
