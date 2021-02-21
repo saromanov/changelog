@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
@@ -28,7 +29,7 @@ func MakeReleaseNotes(r ReleaseRequest) error {
 }
 
 // log returns git log
-func log(req ReleaseRequest, filter func(string) bool) ([]string, error) {
+func log(req ReleaseRequest, filter func(string) bool) ([]Report, error) {
 	r, err := git.PlainOpen(req.Path)
 	if err != nil {
 		return nil, fmt.Errorf("unable to open repo: %v", err)
@@ -45,10 +46,19 @@ func log(req ReleaseRequest, filter func(string) bool) ([]string, error) {
 		return nil, fmt.Errorf("unable to execute git log: %v", err)
 	}
 
-	commits := []string{}
+	tags, err := r.Tags()
+	if err != nil {
+		return nil, fmt.Errorf("unable to get tags: %v", err)
+	}
+
+	tags.ForEach(func(c *plumbing.Reference) error {
+		fmt.Println(c.Name())
+		return nil
+	})
+	commits := []Report{}
 	err = cIter.ForEach(func(c *object.Commit) error {
 		if filter(c.Message) {
-			commits = append(commits, c.Message)
+			commits = append(commits, Report{Message: c.Message, Author: c.Author.Name})
 		}
 
 		return nil
