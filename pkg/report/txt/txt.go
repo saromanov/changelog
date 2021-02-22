@@ -30,5 +30,5 @@ func (t *txt) Do(data []models.Message) error {
 	for _, d := range data {
 		fmt.Println(d)
 	}
-	return ioutil.WriteFile(t.filename, []byte(result))
+	return ioutil.WriteFile(t.filename, []byte(result), 0644)
 }

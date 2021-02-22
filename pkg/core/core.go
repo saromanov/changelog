@@ -7,6 +7,8 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/saromanov/changelog/pkg/models"
+	"github.com/saromanov/changelog/pkg/report"
+	"github.com/saromanov/changelog/pkg/report/txt"
 )
 
 // ReleaseRequest defines request for making release notes
@@ -20,14 +22,16 @@ type ReleaseRequest struct {
 
 // MakeReleaseNotes provides creating of release notes based on git commits
 func MakeReleaseNotes(r ReleaseRequest) error {
+	if r.Filename == "" {
+		return fmt.Errorf("filename is not defined")
+	}
 	messages, err := log(r, func(m string) bool {
 		return len(m) > 0
 	})
 	if err != nil {
 		return fmt.Errorf("unable to get log messages")
 	}
-	fmt.Println(messages)
-	return nil
+	return makeOutput(r, messages)
 }
 
 // log returns git log
@@ -65,4 +69,12 @@ func log(req ReleaseRequest, filter func(string) bool) ([]models.Message, error)
 	})
 
 	return commits, nil
+}
+
+func makeOutput(r ReleaseRequest, m []models.Message) error {
+
+	d := func(rr ReleaseRequest) report.Report {
+		return txt.New(rr.Filename)
+	}
+	return d(r).Do(m)
 }
