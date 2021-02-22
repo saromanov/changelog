@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -63,7 +64,7 @@ func log(req ReleaseRequest, filter func(string) bool) ([]models.Message, error)
 	commits := []models.Message{}
 	err = cIter.ForEach(func(c *object.Commit) error {
 		if filter(c.Message) {
-			commits = append(commits, models.Message{Message: c.Message, Author: c.Author.Name, Date: c.Author.When})
+			commits = append(commits, models.Message{Message: strings.Trim(c.Message, "\n"), Author: c.Author.Name, Date: c.Author.When})
 		}
 		return nil
 	})

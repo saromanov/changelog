@@ -3,6 +3,7 @@ package txt
 import (
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"github.com/saromanov/changelog/pkg/models"
 	"github.com/saromanov/changelog/pkg/report"
@@ -28,7 +29,7 @@ func (t *txt) Do(data []models.Message) error {
 
 	var result string
 	for _, d := range data {
-		fmt.Println(d)
+		result += fmt.Sprintf("%s %s (%s)\n", d.Date.Format(time.RFC3339), d.Message, d.Author)
 	}
 	return ioutil.WriteFile(t.filename, []byte(result), 0644)
 }
