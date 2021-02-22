@@ -4,16 +4,18 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/saromanov/changelog/pkg/models"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/saromanov/changelog/pkg/models"
 )
 
 // ReleaseRequest defines request for making release notes
 type ReleaseRequest struct {
-	Path  string
-	Since time.Time
-	Until time.Time
+	Path     string
+	Type     string
+	Filename string
+	Since    time.Time
+	Until    time.Time
 }
 
 // MakeReleaseNotes provides creating of release notes based on git commits

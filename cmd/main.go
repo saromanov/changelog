@@ -19,7 +19,9 @@ func build(c *cli.Context) error {
 	}
 
 	if err := core.MakeReleaseNotes(core.ReleaseRequest{
-		Path: path,
+		Path:     path,
+		Filename: c.String("filename"),
+		Type:     c.String("type"),
 	}); err != nil {
 		log.WithError(err).Errorf("unable to apply git log")
 		return err
@@ -50,6 +52,16 @@ func main() {
 				Name:  "version",
 				Value: "",
 				Usage: "generated new version",
+			},
+			&cli.StringFlag{
+				Name:  "type",
+				Value: "",
+				Usage: "type of the output",
+			},
+			&cli.StringFlag{
+				Name:  "filename",
+				Value: "",
+				Usage: "filename of the output",
 			},
 		},
 		Commands: []*cli.Command{
