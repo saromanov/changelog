@@ -2,7 +2,7 @@ package txt
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/saromanov/changelog/pkg/models"
@@ -31,5 +31,20 @@ func (t *txt) Do(data []models.Message) error {
 	for _, d := range data {
 		result += fmt.Sprintf("%s %s (%s)\n", d.Date.Format(time.RFC3339), d.Message, d.Author)
 	}
-	return ioutil.WriteFile(t.filename, []byte(result), 0644)
+	return write(t.filename, result)
+}
+
+// write provides append changelog data to the file
+func write(filename, data string) error {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return fmt.Errorf("unable to open file %s: %v", filename, err)
+	}
+
+	defer f.Close()
+
+	if _, err = f.WriteString(data); err != nil {
+		return fmt.Errorf("unable to write to file: %v", err)
+	}
+	return nil
 }
