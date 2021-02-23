@@ -12,12 +12,14 @@ import (
 // txt defines txt report
 type txt struct {
 	filename string
+	title    string
 }
 
 // New provides initialization of txt report
-func New(filename string) report.Report {
+func New(filename, title string) report.Report {
 	return &txt{
 		filename: filename,
+		title:    title,
 	}
 }
 
@@ -27,10 +29,11 @@ func (t *txt) Do(data []models.Message) error {
 		return nil
 	}
 
-	var result string
+	result := t.title
 	for _, d := range data {
 		result += fmt.Sprintf("%s %s (%s)\n", d.Date.Format(time.RFC3339), d.Message, d.Author)
 	}
+	result += "\n"
 	return write(t.filename, result)
 }
 

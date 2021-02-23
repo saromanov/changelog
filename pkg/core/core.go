@@ -12,11 +12,14 @@ import (
 	"github.com/saromanov/changelog/pkg/report/txt"
 )
 
+const defaultReleaseTitle = "New Release!"
+
 // ReleaseRequest defines request for making release notes
 type ReleaseRequest struct {
 	Path     string
 	Type     string
 	Filename string
+	Title    string
 	Since    time.Time
 	Until    time.Time
 }
@@ -26,6 +29,7 @@ func MakeReleaseNotes(r ReleaseRequest) error {
 	if r.Filename == "" {
 		return fmt.Errorf("filename is not defined")
 	}
+	r.Title = makeReleaseTitle(r.Title)
 	messages, err := log(r, func(m string) bool {
 		return len(m) > 0
 	})
@@ -72,10 +76,17 @@ func log(req ReleaseRequest, filter func(string) bool) ([]models.Message, error)
 	return commits, nil
 }
 
-func makeOutput(r ReleaseRequest, m []models.Message) error {
+// returns prepared title for release
+func makeReleaseTitle(title string) string {
+	if title == "" {
+		title = defaultReleaseTitle
+	}
+	return fmt.Sprintf("%s(%s)\n", title, time.Now().Format(time.RFC3339))
+}
 
+func makeOutput(r ReleaseRequest, m []models.Message) error {
 	d := func(rr ReleaseRequest) report.Report {
-		return txt.New(rr.Filename)
+		return txt.New(rr.Filename, rr.Title)
 	}
 	return d(r).Do(m)
 }
