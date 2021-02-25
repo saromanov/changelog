@@ -9,7 +9,7 @@ import (
 	"github.com/saromanov/changelog/pkg/report"
 )
 
-// txt defines txt report
+// txt defines report for txt 
 type txt struct {
 	filename string
 	title    string
