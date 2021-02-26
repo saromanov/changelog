@@ -56,15 +56,7 @@ func log(req ReleaseRequest, filter func(string) bool) ([]models.Message, error)
 	if err != nil {
 		return nil, fmt.Errorf("unable to execute git log: %v", err)
 	}
-
-	tags, err := r.TagObjects()
-	if err != nil {
-		return nil, fmt.Errorf("unable to get tags: %v", err)
-	}
-	tags.ForEach(func(c *object.Tag) error {
-		fmt.Println(c.Tagger.When.Clock())
-		return nil
-	})
+	
 	commits := []models.Message{}
 	err = cIter.ForEach(func(c *object.Commit) error {
 		if filter(c.Message) {
