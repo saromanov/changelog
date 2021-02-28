@@ -23,6 +23,7 @@ func build(c *cli.Context) error {
 		Filename: c.String("filename"),
 		Type:     c.String("type"),
 		Title:    c.String("title"),
+		Pattern:  c.String("pattern"),
 	}); err != nil {
 		log.WithError(err).Errorf("unable to apply git log")
 		return err
@@ -68,6 +69,11 @@ func main() {
 				Name:  "title",
 				Value: "",
 				Usage: "title of the release",
+			},
+			&cli.StringFlag{
+				Name:  "pattern",
+				Value: "",
+				Usage: "pattern for get commit for changelog",
 			},
 		},
 		Commands: []*cli.Command{

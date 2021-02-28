@@ -9,8 +9,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/saromanov/changelog/pkg/models"
 	"github.com/saromanov/changelog/pkg/report"
-	"github.com/saromanov/changelog/pkg/report/txt"
 	"github.com/saromanov/changelog/pkg/report/markdown"
+	"github.com/saromanov/changelog/pkg/report/txt"
 )
 
 const defaultReleaseTitle = "New Release!"
@@ -21,6 +21,7 @@ type ReleaseRequest struct {
 	Type     string
 	Filename string
 	Title    string
+	Pattern  string
 	Since    time.Time
 	Until    time.Time
 }
@@ -32,7 +33,10 @@ func MakeReleaseNotes(r ReleaseRequest) error {
 	}
 	r.Title = makeReleaseTitle(r.Title)
 	messages, err := log(r, func(m string) bool {
-		return len(m) > 0
+		if len(r.Pattern) == 0 {
+			return true
+		}
+		return strings.HasPrefix(m, r.Pattern)
 	})
 	if err != nil {
 		return fmt.Errorf("unable to get log messages")
@@ -57,11 +61,12 @@ func log(req ReleaseRequest, filter func(string) bool) ([]models.Message, error)
 	if err != nil {
 		return nil, fmt.Errorf("unable to execute git log: %v", err)
 	}
-	
+
 	commits := []models.Message{}
 	err = cIter.ForEach(func(c *object.Commit) error {
-		if filter(c.Message) {
-			commits = append(commits, models.Message{Message: strings.Trim(c.Message, "\n"), Author: c.Author.Name, Date: c.Author.When})
+		message := strings.Trim(c.Message, "\n")
+		if filter(message) {
+			commits = append(commits, models.Message{Message: message, Author: c.Author.Name, Date: c.Author.When})
 		}
 		return nil
 	})
