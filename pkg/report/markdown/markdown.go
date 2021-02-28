@@ -30,7 +30,7 @@ func (t *markdown) Do(data []models.Message) error {
 
 	result := "# " + t.title
 	for _, d := range data {
-		result += fmt.Sprintf("* %s %s (%s)\n", d.Date.Format(time.RFC3339), d.Message, d.Author)
+		result += fmt.Sprintf("*%s %s (%s)\n", d.Date.Format(time.RFC3339), d.Message, d.Author)
 	}
 	result += "\n"
 	return report.Write(t.filename, result)

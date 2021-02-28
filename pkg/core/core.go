@@ -10,6 +10,7 @@ import (
 	"github.com/saromanov/changelog/pkg/models"
 	"github.com/saromanov/changelog/pkg/report"
 	"github.com/saromanov/changelog/pkg/report/txt"
+	"github.com/saromanov/changelog/pkg/report/markdown"
 )
 
 const defaultReleaseTitle = "New Release!"
@@ -77,8 +78,19 @@ func makeReleaseTitle(title string) string {
 }
 
 func makeOutput(r ReleaseRequest, m []models.Message) error {
+
 	d := func(rr ReleaseRequest) report.Report {
-		return txt.New(rr.Filename, rr.Title)
+		return getOutputType(rr)
 	}
 	return d(r).Do(m)
+}
+
+// return output type for report
+func getOutputType(rr ReleaseRequest) report.Report {
+	switch rr.Type {
+	case "markdown":
+		return markdown.New(rr.Filename, rr.Title)
+	default:
+		return txt.New(rr.Filename, rr.Title)
+	}
 }
